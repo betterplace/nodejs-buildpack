@@ -44,6 +44,7 @@ install_nodejs() {
   rm -rf $dir/*
   mv /tmp/node-v$number-$os-$cpu/* $dir
   chmod +x $dir/bin/*
+  ln -s $dir/bin/node $dir/bin/nodejs
 }
 
 install_iojs() {
