@@ -17,7 +17,11 @@ get_meteor_minor_version() {
 # Format of .meteor/release file is METEOR@1.4.x-patchsomething
 meteor_node_version() {
   minor=$(get_meteor_minor_version)
-  if [ "$minor" -ge 6 ] ; then
+  if [ "$minor" -ge 9 ] ; then
+    echo "13.7.x"
+  elif [ "$minor" -ge 8 ] ; then
+    echo "8.16.x"
+  elif [ "$minor" -ge 6 ] ; then
     echo "8.11.x"
   elif [ "$minor" -ge 4 ] ; then
     echo "4.9.x"
@@ -28,7 +32,9 @@ meteor_node_version() {
 
 meteor_npm_version() {
   minor=$(get_meteor_minor_version)
-  if [ "$minor" -ge 6 ] ; then
+  if [ "$minor" -ge 8 ] ; then
+    echo "6.x"
+  elif [ "$minor" -ge 6 ] ; then
     echo "5.x"
   elif [ "$minor" -ge 4 ] ; then
     echo "4.6.x"
@@ -87,11 +93,19 @@ EOF
 
 create_meteor_startup_file() {
   local build_dir=$1
+  local minor=$(get_meteor_minor_version)
 
-  cat << EOF > "${build_dir}/.start-meteor-app"
+  if [ "$minor" -lt 8 ] ; then
+    cat << EOF > "${build_dir}/.start-meteor-app"
 cd .app-build/bundle/programs/server
 exec node \$NODE_BOOT_FLAGS boot.js program.json
 EOF
+  else
+    cat << EOF > "${build_dir}/.start-meteor-app"
+cd .app-build/bundle
+exec node \$NODE_BOOT_FLAGS main.js
+EOF
+  fi
 
   chmod +x "${build_dir}/.start-meteor-app"
 }
